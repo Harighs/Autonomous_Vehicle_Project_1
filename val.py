@@ -356,15 +356,18 @@ def run(
     maps = np.zeros(nc) + map
     for i, c in enumerate(ap_class):
         maps[c] = ap[i]
-        
-    # Final Accuracy
-    fp_array, tp_array = fp, tp
-    Accuracy = [(tp / (tp + fp)) if (tp + fp) > 0 else 0 for tp, fp in zip(tp_array, fp_array)]
-    finally_accuracy = sum(Accuracy) / len(Accuracy)
     
-    # calculate average of tuple
-    avg_time = sum(t) / len(t)
-    print('Finally Accuracy:', finally_accuracy, '\n', 'mAP:', map, '\n', 'Average Speed:', round(avg_time, 2), 'seconds', '\n')
+    if not training:
+        # Calculate final accuracy directly within the print statement
+        finally_accuracy = sum((tp / (tp + fp) if (tp + fp) > 0 else 0) for tp, fp in zip(tp, fp)) / len(tp)
+        print("----------------------------------------------------------------")
+        # Calculate and print final accuracy, mAP, and average speed
+        print(
+            f'Finally Accuracy: {finally_accuracy:.3f}\n',
+            f'mAP: {map}\n',
+            f'Average Speed: {sum(t) / len(t):.2f}\n'
+        )
+
     return (mp, mr, map50, map, *(loss.cpu() / len(dataloader)).tolist()), maps, t
 
 
